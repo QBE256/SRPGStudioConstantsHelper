@@ -18,7 +18,7 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
     const constantsPath = path.join(folderUri[0].fsPath, 'constants', 'constants-enumeratedtype.js')  
     if (fs.existsSync(constantsPath)) {
       const fileContent = await fs.promises.readFile(constantsPath, 'utf8')
-      const constantMap: Map<string, Record<string, string | number>> = new Map()
+      const constantMap: Map<string, object> = new Map()
       const regex = /var\s+(\w+)\s*=\s*({[^}]+});/g
       let match
       while ((match = regex.exec(fileContent)) !== null) {
@@ -55,35 +55,44 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
 
       const completionEnumeratorProvider = vscode.languages.registerCompletionItemProvider(
         { scheme: 'file', language: 'javascript' },{
-          provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+          provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
             const currentLinePrefix = document.lineAt(position).text.slice(0, position.character)
             const completionItems: vscode.CompletionItem[] = []
-            const headChainPattern = /\s*[a-zA-Z0-9][^.]*\.$/
+            const headChainPattern = /(?<=\b|\s)[a-zA-Z_][a-zA-Z0-9_]*(?=\.|\s|$)/
             const headChainMatch = currentLinePrefix.match(headChainPattern)
             if (!headChainMatch) {
               return []
             }
             const headChainStr = headChainMatch[0].trim().replace('.', '')
             if (constantMap.has(headChainStr)) {
-              const enumerator = constantMap.get(headChainStr)
-              if (!enumerator) {
+              const enumMember = constantMap.get(headChainStr) as object
+              if (!enumMember) {
                 return []
               }
-              const items = Object.entries(enumerator).map(([enumerator, value]) => {
-                const completionItem = new vscode.CompletionItem(enumerator, vscode.CompletionItemKind.Constant)
-                completionItem.label = `${enumerator} - ${value}`
-                completionItem.insertText = enumerator
-                completionItem.detail = `${headChainStr}.${enumerator}:${value}`
+              const items = Object.entries(enumMember).map(([enumMemberKey, enumMemberValue], index) => {
+                const completionItem = new vscode.CompletionItem(`${headChainStr}.${enumMemberKey}`, vscode.CompletionItemKind.EnumMember)
+                completionItem.label = `${headChainStr}.${enumMemberKey}`
+                completionItem.insertText = enumMemberKey
+                completionItem.detail = `${headChainStr}.${enumMemberKey}:${enumMemberValue}`
+                completionItem.sortText = `${index}`
+                completionItem.filterText = `.${enumMemberKey}`
+                completionItem.kind = vscode.CompletionItemKind.EnumMember
                 return completionItem
               })
               completionItems.push(...items)
             }
-            return completionItems
+            return new vscode.CompletionList(completionItems)
           },
         },
         '.',
+        '"',
+        '`',
+        '\/',
+        '@',
+        '<',
+        '#',
+        ' ',
       )
-    
 
       context.subscriptions.push(completionEnumeratorProvider)
       return vscode.Disposable.from(completionEnumProvider, completionEnumeratorProvider)
@@ -92,6 +101,7 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
 }
 
 export const activate = (context: vscode.ExtensionContext) => {
+  const config = vscode.workspace.getConfiguration()
   const register = vscode.commands.registerCommand('extension.showConstants', async () => {
     const completionItemProvider = await createShowConstantsCommand(context)
     if (!!completionItemProvider) {
