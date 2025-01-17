@@ -1,1 +1,1 @@
-VSCodeのSRPGStudio用拡張プラグイン
+VSCodeのSRPGStudio用拡張プラグイン:
