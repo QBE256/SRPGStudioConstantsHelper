@@ -1,0 +1,46 @@
+{
+  "publisher": "cube",
+  "name": "srpg-studio-constants-helper",
+  "displayName": "SRPG Studio Constants Helper",
+  "description": "Provides intelligent code completion for SRPG Studio enumerated constants.",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.showConstants"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.showConstants",
+        "title": "SRPG Studio Constants Helper"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "mkdir -p out/test/testFile && cp -r src/test/testFile out/test && vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/sinon": "^17.0.3",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.16.0",
+    "sinon": "^19.0.2",
+    "typescript": "^5.7.2"
+  }
+}
