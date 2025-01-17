@@ -1,5 +1,5 @@
 {
-  "publisher": "cube",
+  "publisher": "Cube",
   "name": "srpg-studio-constants-helper",
   "displayName": "SRPG Studio Constants Helper",
   "description": "Provides intelligent code completion for SRPG Studio enumerated constants.",
