@@ -58,28 +58,28 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
           provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
             const currentLinePrefix = document.lineAt(position).text.slice(0, position.character)
             const completionItems: vscode.CompletionItem[] = []
-            const headChainPattern = /(?<=\b|\s)[a-zA-Z_][a-zA-Z0-9_]*(?=\.|\s|$)/
-            const headChainMatch = currentLinePrefix.match(headChainPattern)
-            if (!headChainMatch) {
+            const headChainPattern = /\b\w+\.(?=\s*\{|\s*\(|\s*\[|\s*\w|$)/g
+            const matchChains = currentLinePrefix.match(headChainPattern)
+            if (!matchChains) {
               return []
             }
             if (context.triggerCharacter !== '.') {
               return []
             }
-            const headChainStr = headChainMatch[0].trim().replace('.', '')
-            if (constantMap.has(headChainStr)) {
-              const enumMember = constantMap.get(headChainStr) as object
+            const headChain = matchChains.pop()?.trim().replace('.', '') || ''
+            if (constantMap.has(headChain)) {
+              const enumMember = constantMap.get(headChain) as object
               if (!enumMember) {
                 return []
               }
               const items = Object.entries(enumMember).map(([enumMemberKey, enumMemberValue], index) => {
                 const completionItem = new vscode.CompletionItem(`${enumMemberKey}`, vscode.CompletionItemKind.EnumMember)
                 completionItem.label = `${enumMemberKey}`
-                completionItem.insertText = enumMemberKey
-                completionItem.detail = `${headChainStr}.${enumMemberKey}:${enumMemberValue}`
+                completionItem.insertText = `${headChain}.${enumMemberKey}`
+                completionItem.detail = `${headChain}.${enumMemberKey}:${enumMemberValue}`
                 completionItem.sortText = `\u0000${index}`
-                completionItem.filterText = `${headChainStr}.${enumMemberKey}`
-                completionItem.range = new vscode.Range(position.translate(0, -1 * headChainStr.length - 1), position)
+                completionItem.filterText = `${headChain}.${enumMemberKey}`
+                completionItem.range = new vscode.Range(position.translate(0, -1 * headChain.length - 1), position)
                 completionItem.kind = vscode.CompletionItemKind.EnumMember
                 return completionItem
               })
