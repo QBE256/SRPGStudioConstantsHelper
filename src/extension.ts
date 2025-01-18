@@ -7,7 +7,7 @@ export const readScriptFolder = async ():Promise<vscode.Uri[] | undefined> => {
     canSelectFiles: false,
     canSelectFolders: true,
     canSelectMany: false,
-    openLabel: 'Select Script Folder.',
+    openLabel: 'Select Script Folder',
   })
   return folderUri
 }
@@ -63,6 +63,9 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
             if (!headChainMatch) {
               return []
             }
+            if (context.triggerCharacter !== '.') {
+              return []
+            }
             const headChainStr = headChainMatch[0].trim().replace('.', '')
             if (constantMap.has(headChainStr)) {
               const enumMember = constantMap.get(headChainStr) as object
@@ -70,12 +73,13 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
                 return []
               }
               const items = Object.entries(enumMember).map(([enumMemberKey, enumMemberValue], index) => {
-                const completionItem = new vscode.CompletionItem(`${headChainStr}.${enumMemberKey}`, vscode.CompletionItemKind.EnumMember)
-                completionItem.label = `${headChainStr}.${enumMemberKey}`
+                const completionItem = new vscode.CompletionItem(`${enumMemberKey}`, vscode.CompletionItemKind.EnumMember)
+                completionItem.label = `${enumMemberKey}`
                 completionItem.insertText = enumMemberKey
                 completionItem.detail = `${headChainStr}.${enumMemberKey}:${enumMemberValue}`
-                completionItem.sortText = `${index}`
-                completionItem.filterText = `.${enumMemberKey}`
+                completionItem.sortText = `\u0000${index}`
+                completionItem.filterText = `${headChainStr}.${enumMemberKey}`
+                completionItem.range = new vscode.Range(position.translate(0, -1 * headChainStr.length - 1), position)
                 completionItem.kind = vscode.CompletionItemKind.EnumMember
                 return completionItem
               })
@@ -85,13 +89,6 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
           },
         },
         '.',
-        '"',
-        '`',
-        '\/',
-        '@',
-        '<',
-        '#',
-        ' ',
       )
 
       context.subscriptions.push(completionEnumeratorProvider)
@@ -101,7 +98,6 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
 }
 
 export const activate = (context: vscode.ExtensionContext) => {
-  const config = vscode.workspace.getConfiguration()
   const register = vscode.commands.registerCommand('extension.showConstants', async () => {
     const completionItemProvider = await createShowConstantsCommand(context)
     if (!!completionItemProvider) {
