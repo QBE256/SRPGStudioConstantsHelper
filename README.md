@@ -6,7 +6,7 @@ Scriptフォルダ内にある`constants-enumeratedtype.js`で定義されてい
 <img src="./material/demo.gif" width="500px">
 
 ## 設定方法
-`Ctrl+Shift+P`後、`SRPGStudio Constants Helper`をコマンドを入力し、実行します。  
+`Ctrl+Shift+P`後、`SRPGStudio Constants Helper`と入力し、実行します。  
 <img src="./material/command.png" width="500px">
 
 
