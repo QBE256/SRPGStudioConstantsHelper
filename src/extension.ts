@@ -1,13 +1,13 @@
-import * as vscode from 'vscode'
-import * as fs from 'fs'
-import * as path from 'path'
+import * as vscode from "vscode"
+import * as fs from "fs"
+import * as path from "path"
 
-export const readScriptFolder = async ():Promise<vscode.Uri[] | undefined> => {
+export const readScriptFolder = async (): Promise<vscode.Uri[] | undefined> => {
   const folderUri = await vscode.window.showOpenDialog({
     canSelectFiles: false,
     canSelectFolders: true,
     canSelectMany: false,
-    openLabel: 'Select Script Folder',
+    openLabel: "Select Script Folder",
   })
   return folderUri
 }
@@ -15,9 +15,9 @@ export const readScriptFolder = async ():Promise<vscode.Uri[] | undefined> => {
 const createShowConstantsCommand = async (context: vscode.ExtensionContext): Promise<vscode.Disposable | undefined> => {
   const folderUri = await readScriptFolder()
   if (folderUri && folderUri[0]) {
-    const constantsPath = path.join(folderUri[0].fsPath, 'constants', 'constants-enumeratedtype.js')  
+    const constantsPath = path.join(folderUri[0].fsPath, "constants", "constants-enumeratedtype.js")
     if (fs.existsSync(constantsPath)) {
-      const fileContent = await fs.promises.readFile(constantsPath, 'utf8')
+      const fileContent = await fs.promises.readFile(constantsPath, "utf8")
       const constantMap: Map<string, object> = new Map()
       const regex = /var\s+(\w+)\s*=\s*({[^}]+});/g
       let match
@@ -26,7 +26,7 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
           // JSON変換に不都合な部分を置換する
           // 16進数の値はJSON.parseには使えないため、文字列に変換する
           const jsonString = match[2]
-            .replace(/\/\/.*/g, '')
+            .replace(/\/\/.*/g, "")
             .replace(/(\w+)\s*:/g, '"$1":')
             .replace(/'/g, '"')
             .replace(/0x[0-9a-fA-F]+/g, (hex) => `"${hex}"`)
@@ -35,27 +35,36 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
           console.log(e)
         }
       }
-                
+
       if (constantMap.size === 0) {
-        vscode.window.showErrorMessage('Read error in the file.')
+        vscode.window.showErrorMessage("Read error in the file.")
         return
       }
-                
-      const completionEnumProvider = vscode.languages.registerCompletionItemProvider( { scheme: 'file', language: 'javascript' }, {
-        provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
-          const completionItems: vscode.CompletionItem[] = []
-          constantMap.forEach((value, key) => {
-            const item = new vscode.CompletionItem(key, vscode.CompletionItemKind.Enum)
-            item.detail = JSON.stringify(value, null, 2)
-            completionItems.push(item)
-          })
-          return completionItems
+
+      const completionEnumProvider = vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: "javascript" },
+        {
+          provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+            const completionItems: vscode.CompletionItem[] = []
+            constantMap.forEach((value, key) => {
+              const item = new vscode.CompletionItem(key, vscode.CompletionItemKind.Enum)
+              item.detail = JSON.stringify(value, null, 2)
+              completionItems.push(item)
+            })
+            return completionItems
+          },
         },
-      })
+      )
 
       const completionEnumeratorProvider = vscode.languages.registerCompletionItemProvider(
-        { scheme: 'file', language: 'javascript' },{
-          provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
+        { scheme: "file", language: "javascript" },
+        {
+          provideCompletionItems(
+            document: vscode.TextDocument,
+            position: vscode.Position,
+            token: vscode.CancellationToken,
+            context: vscode.CompletionContext,
+          ) {
             const currentLinePrefix = document.lineAt(position).text.slice(0, position.character)
             const completionItems: vscode.CompletionItem[] = []
             const headChainPattern = /\b\w+\.(?=\s*\{|\s*\(|\s*\[|\s*\w|$)/g
@@ -63,17 +72,20 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
             if (!matchChains) {
               return []
             }
-            if (context.triggerCharacter !== '.') {
+            if (context.triggerCharacter !== ".") {
               return []
             }
-            const headChain = matchChains.pop()?.trim().replace('.', '') || ''
+            const headChain = matchChains.pop()?.trim().replace(".", "") || ""
             if (constantMap.has(headChain)) {
               const enumMember = constantMap.get(headChain) as object
               if (!enumMember) {
                 return []
               }
               const items = Object.entries(enumMember).map(([enumMemberKey, enumMemberValue], index) => {
-                const completionItem = new vscode.CompletionItem(`${enumMemberKey}`, vscode.CompletionItemKind.EnumMember)
+                const completionItem = new vscode.CompletionItem(
+                  `${enumMemberKey}`,
+                  vscode.CompletionItemKind.EnumMember,
+                )
                 completionItem.label = `${enumMemberKey}`
                 completionItem.insertText = `${headChain}.${enumMemberKey}`
                 completionItem.detail = `${headChain}.${enumMemberKey}:${enumMemberValue}`
@@ -88,17 +100,55 @@ const createShowConstantsCommand = async (context: vscode.ExtensionContext): Pro
             return new vscode.CompletionList(completionItems)
           },
         },
-        '.',
+        ".",
+      )
+      const hoverProvider = vscode.languages.registerHoverProvider(
+        { scheme: "file", language: "javascript" },
+        {
+          provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) {
+            const enumeratorRange = document.getWordRangeAtPosition(position, /[a-zA-Z0-9_\-\.]+/)
+            if (!enumeratorRange) {
+              return null
+            }
+            const currentLine = document.lineAt(position).text
+            const currentWord = document.getText(enumeratorRange)
+            const enumElements = currentWord.split(".")
+            if (enumElements.length >= 3 || enumElements.length === 0) {
+              return null
+            }
+            const isWrittenEnumMember = enumElements.length === 2 && !!enumElements[1]
+
+            const enumName = isWrittenEnumMember ? enumElements[0] : currentWord
+            const currentEnumMemberKey = isWrittenEnumMember ? enumElements[1] : null
+            if (!constantMap.has(enumName)) {
+              return null
+            }
+            const enumMembers = constantMap.get(enumName) as object
+            const markdown = new vscode.MarkdownString()
+            markdown.supportHtml = true
+            markdown.appendMarkdown(`<span style="color:#00cc66;">${enumName}</span><br>`)
+            markdown.appendMarkdown(`<hr><br>`)
+            for (const [enumMemberKey, enumMemberValue] of Object.entries(enumMembers)) {
+              if (enumMemberKey === currentEnumMemberKey) {
+                markdown.appendMarkdown(`<span style="color:#00b0ff;">${enumMemberKey}: ${enumMemberValue}</span><br>`)
+              } else {
+                markdown.appendMarkdown(`${enumMemberKey}: ${enumMemberValue}<br>`)
+              }
+            }
+
+            return new vscode.Hover(markdown)
+          },
+        },
       )
 
-      context.subscriptions.push(completionEnumeratorProvider)
-      return vscode.Disposable.from(completionEnumProvider, completionEnumeratorProvider)
+      context.subscriptions.push(completionEnumeratorProvider, hoverProvider)
+      return vscode.Disposable.from(completionEnumProvider, completionEnumeratorProvider, hoverProvider)
     }
   }
 }
 
 export const activate = (context: vscode.ExtensionContext) => {
-  const register = vscode.commands.registerCommand('extension.showConstants', async () => {
+  const register = vscode.commands.registerCommand("extension.showConstants", async () => {
     const completionItemProvider = await createShowConstantsCommand(context)
     if (!!completionItemProvider) {
       context.subscriptions.push(completionItemProvider)
