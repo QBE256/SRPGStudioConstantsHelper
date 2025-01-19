@@ -32,7 +32,6 @@ export class EnumHoverProvider implements vscode.HoverProvider {
     markdown.appendMarkdown(`<hr><br>`)
     for (const [enumMemberKey, enumMemberValue] of Object.entries(enumMembers)) {
       if (enumMemberKey === currentEnumMemberKey) {
-        markdown.appendMarkdown(`<span style="color:#00b0ff;">${enumMemberKey}: ${enumMemberValue}</span><br>`)
       } else {
         markdown.appendMarkdown(`${enumMemberKey}: ${enumMemberValue}<br>`)
       }
