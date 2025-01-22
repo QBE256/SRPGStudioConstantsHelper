@@ -1,13 +1,13 @@
-import * as assert from "assert";
-import * as vscode from "vscode";
-import { StringTableMemberCompletionItemProvider } from "../../providers/stringTableMemberCompletionItemProvider";
+import * as assert from "assert"
+import * as vscode from "vscode"
+import { StringTableMemberCompletionItemProvider } from "../../providers/stringTableMemberCompletionItemProvider"
 
 suite("StringTableMemberCompletionItemProvider テスト", () => {
-  const constantMap = new Map();
+  const constantMap = new Map()
   constantMap.set("StringTable", {
     MESSAGE: "システムメッセージです",
-    ERROR: "エラーです"
-  });
+    ERROR: "エラーです",
+  })
   suite("StringTableMemberCompletionItemProvider.provideCompletionItems テスト", () => {
     test("StringTable.と入力した時にStringTableのメンバー情報がサジェストに表示される。", async () => {
       const mockDocument = {
@@ -16,29 +16,29 @@ suite("StringTableMemberCompletionItemProvider テスト", () => {
         getText: () => "StringTable.",
         uri: vscode.Uri.parse("file:///test.js"),
         fileName: "test.js",
-        languageId: "javascript"
-      } as unknown as vscode.TextDocument;
-      const mockPosition = new vscode.Position(0, 12);
+        languageId: "javascript",
+      } as unknown as vscode.TextDocument
+      const mockPosition = new vscode.Position(0, 12)
       const mockToken = {
         isCancellationRequested: false,
-        onCancellationRequested: () => ({ dispose: () => {} })
-      } as vscode.CancellationToken;
+        onCancellationRequested: () => ({ dispose: () => {} }),
+      } as vscode.CancellationToken
       const mockContext = {
         triggerKind: vscode.CompletionTriggerKind.Invoke,
-        triggerCharacter: "."
-      } as vscode.CompletionContext;
+        triggerCharacter: ".",
+      } as vscode.CompletionContext
 
-      const completionItemProvider = new StringTableMemberCompletionItemProvider(constantMap);
+      const completionItemProvider = new StringTableMemberCompletionItemProvider(constantMap)
       const completionItemResult = completionItemProvider.provideCompletionItems(
         mockDocument,
         mockPosition,
         mockToken,
-        mockContext
-      );
+        mockContext,
+      )
 
-      assert.ok(completionItemResult);
-      assert.ok(completionItemResult instanceof vscode.CompletionList);
-      assert.ok(completionItemResult.items.length === 2);
+      assert.ok(completionItemResult)
+      assert.ok(completionItemResult instanceof vscode.CompletionList)
+      assert.ok(completionItemResult.items.length === 2)
       assert.deepEqual(completionItemResult.items[0], {
         label: "MESSAGE",
         insertText: "StringTable.MESSAGE",
@@ -48,15 +48,15 @@ suite("StringTableMemberCompletionItemProvider テスト", () => {
         range: {
           c: {
             c: 0,
-            e: 0
+            e: 0,
           },
           e: {
             c: 0,
-            e: 12
-          }
+            e: 12,
+          },
         },
-        kind: vscode.CompletionItemKind.EnumMember
-      });
+        kind: vscode.CompletionItemKind.EnumMember,
+      })
       assert.deepEqual(completionItemResult.items[1], {
         label: "ERROR",
         insertText: "StringTable.ERROR",
@@ -66,16 +66,16 @@ suite("StringTableMemberCompletionItemProvider テスト", () => {
         range: {
           c: {
             c: 0,
-            e: 0
+            e: 0,
           },
           e: {
             c: 0,
-            e: 12
-          }
+            e: 12,
+          },
         },
-        kind: vscode.CompletionItemKind.EnumMember
-      });
-    });
+        kind: vscode.CompletionItemKind.EnumMember,
+      })
+    })
     test("StringTableと入力した時にサジェストは表示されない", async () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 8 } }),
@@ -83,29 +83,29 @@ suite("StringTableMemberCompletionItemProvider テスト", () => {
         getText: () => "UnitType",
         uri: vscode.Uri.parse("file:///test.js"),
         fileName: "test.js",
-        languageId: "javascript"
-      } as unknown as vscode.TextDocument;
-      const mockPosition = new vscode.Position(0, 8);
+        languageId: "javascript",
+      } as unknown as vscode.TextDocument
+      const mockPosition = new vscode.Position(0, 8)
       const mockToken = {
         isCancellationRequested: false,
-        onCancellationRequested: () => ({ dispose: () => {} })
-      } as vscode.CancellationToken;
+        onCancellationRequested: () => ({ dispose: () => {} }),
+      } as vscode.CancellationToken
       const mockContext = {
         triggerKind: vscode.CompletionTriggerKind.Invoke,
-        triggerCharacter: "e"
-      } as vscode.CompletionContext;
+        triggerCharacter: "e",
+      } as vscode.CompletionContext
 
-      const completionItemProvider = new StringTableMemberCompletionItemProvider(constantMap);
+      const completionItemProvider = new StringTableMemberCompletionItemProvider(constantMap)
       const completionItemResult = completionItemProvider.provideCompletionItems(
         mockDocument,
         mockPosition,
         mockToken,
-        mockContext
-      );
+        mockContext,
+      )
 
-      assert.ok(completionItemResult);
-      assert.ok(completionItemResult instanceof vscode.CompletionList);
-      assert.strictEqual(completionItemResult.items.length, 0);
-    });
-  });
-});
+      assert.ok(completionItemResult)
+      assert.ok(completionItemResult instanceof vscode.CompletionList)
+      assert.strictEqual(completionItemResult.items.length, 0)
+    })
+  })
+})
