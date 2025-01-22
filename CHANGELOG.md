@@ -4,6 +4,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- v1.2.1
+  バグ修正
 - v1.2.0
   ゲーム内メッセージファイルにも対応
 - v1.1.1
