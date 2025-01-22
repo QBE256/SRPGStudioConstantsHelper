@@ -9,7 +9,7 @@ suite("StringTableNameCompletionProvider Test", () => {
     ERROR: "エラーです",
   })
   suite("StringTableNameCompletionProvider.provideCompletionItems テスト", () => {
-    test("サジェストにStringTableの情報が表示される。", async () => {
+    test("サジェストにStringTableの情報が表示される。", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 0 } }),
         lineAt: () => ({ text: "" }),

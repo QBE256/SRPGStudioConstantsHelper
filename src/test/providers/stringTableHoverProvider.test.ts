@@ -9,7 +9,7 @@ suite("StringTableHoverProvider Test", () => {
     ERROR: "エラーです",
   })
   suite("StringTableHoverProvider.provideHover テスト", () => {
-    test("StringTable.MESSAGEのMESSAGEにホバーした時に、メッセージ内容が展開される", async () => {
+    test("StringTable.MESSAGEのMESSAGEにホバーした時に、メッセージ内容が展開される", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 19 } }),
         lineAt: () => ({ text: "StringTable.MESSAGE" }),
@@ -30,7 +30,7 @@ suite("StringTableHoverProvider Test", () => {
         '<span style="color:#00cc66;">This is the message shown in game.</span><br><hr><br><span style="color:#00b0ff;">システムメッセージです</span><br>',
       )
     })
-    test("StringTable.MESSAGEのStringTableにホバーした時に、メッセージ内容が展開される", async () => {
+    test("StringTable.MESSAGEのStringTableにホバーした時に、メッセージ内容が展開される", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 19 } }),
         lineAt: () => ({ text: "StringTable.MESSAGE" }),
@@ -51,7 +51,7 @@ suite("StringTableHoverProvider Test", () => {
         '<span style="color:#00cc66;">This is the message shown in game.</span><br><hr><br><span style="color:#00b0ff;">システムメッセージです</span><br>',
       )
     })
-    test("StringTableのみだとホバーした時に何も表示されない", async () => {
+    test("StringTableのみだとホバーした時に何も表示されない", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 10 } }),
         lineAt: () => ({ text: "StringTable" }),

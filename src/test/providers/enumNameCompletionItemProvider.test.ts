@@ -15,7 +15,7 @@ suite("EnumNameCompletionProvider テスト", () => {
     MAGIC: 2,
   })
   suite("EnumNameCompletionProvider.provideCompletionItems テスト", () => {
-    test("サジェストにUnitTypeとDamageTypeの情報が表示される。", async () => {
+    test("サジェストにUnitTypeとDamageTypeの情報が表示される。", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 0 } }),
         lineAt: () => ({ text: "" }),

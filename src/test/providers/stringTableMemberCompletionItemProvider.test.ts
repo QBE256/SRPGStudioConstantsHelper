@@ -9,7 +9,7 @@ suite("StringTableMemberCompletionItemProvider テスト", () => {
     ERROR: "エラーです",
   })
   suite("StringTableMemberCompletionItemProvider.provideCompletionItems テスト", () => {
-    test("StringTable.と入力した時にStringTableのメンバー情報がサジェストに表示される。", async () => {
+    test("StringTable.と入力した時にStringTableのメンバー情報がサジェストに表示される。", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 12 } }),
         lineAt: () => ({ text: "StringTable." }),
@@ -76,7 +76,7 @@ suite("StringTableMemberCompletionItemProvider テスト", () => {
         kind: vscode.CompletionItemKind.EnumMember,
       })
     })
-    test("StringTableと入力した時にサジェストは表示されない", async () => {
+    test("StringTableと入力した時にサジェストは表示されない", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 8 } }),
         lineAt: () => ({ text: "UnitType" }),

@@ -10,7 +10,7 @@ suite("EnumHoverProvider テスト", () => {
     ALLY: 3,
   })
   suite("EnumHoverProvider.provideHover テスト", () => {
-    test("UnitType.ALLYのうち、ALLYにホバーした時にUnitTypeの情報が表示される。ALLYだけ青色になる。", async () => {
+    test("UnitType.ALLYのうち、ALLYにホバーした時にUnitTypeの情報が表示される。ALLYだけ青色になる。", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 13 } }),
         lineAt: () => ({ text: "UnitType.ALLY" }),
@@ -30,7 +30,7 @@ suite("EnumHoverProvider テスト", () => {
         '<span style="color:#00cc66;">UnitType</span><br><hr><br>PLAYER: 1<br>ENEMY: 2<br><span style="color:#00b0ff;">ALLY: 3</span><br>',
       )
     })
-    test("UnitType.ALLYのうち、UnitTypeにホバーした時にUnitTypeの情報が表示される。ALLYだけ青色になる。", async () => {
+    test("UnitType.ALLYのうち、UnitTypeにホバーした時にUnitTypeの情報が表示される。ALLYだけ青色になる。", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 13 } }),
         lineAt: () => ({ text: "UnitType.ALLY" }),

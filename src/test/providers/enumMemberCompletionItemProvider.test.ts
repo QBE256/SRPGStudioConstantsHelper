@@ -15,7 +15,7 @@ suite("EnumMemberCompletionProvider テスト", () => {
     MAGIC: 2,
   })
   suite("EnumMemberCompletionProvider.provideCompletionItems テスト", () => {
-    test("UnitType.と入力した時にUnitTypeのメンバー情報がサジェストに表示される。", async () => {
+    test("UnitType.と入力した時にUnitTypeのメンバー情報がサジェストに表示される。", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 9 } }),
         lineAt: () => ({ text: "UnitType." }),
@@ -100,7 +100,7 @@ suite("EnumMemberCompletionProvider テスト", () => {
         kind: vscode.CompletionItemKind.EnumMember,
       })
     })
-    test("UnitTypeと入力した時にサジェストは表示されない", async () => {
+    test("UnitTypeと入力した時にサジェストは表示されない", () => {
       const mockDocument = {
         getWordRangeAtPosition: () => ({ start: { character: 0 }, end: { character: 8 } }),
         lineAt: () => ({ text: "UnitType" }),
