@@ -4,6 +4,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- v1.2.2
+  ファイルを再度読み込んだ時にサジェスト等が重複して表示されるバグを修正
 - v1.2.1
   バグ修正
 - v1.2.0

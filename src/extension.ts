@@ -7,6 +7,22 @@ import { StringTableNameCompletionItemProvider } from "./providers/stringTableNa
 import { StringTableMemberCompletionItemProvider } from "./providers/stringTableMemberCompletionItemProvider"
 import { StringTableHoverProvider } from "./providers/stringTableHoverProvider"
 
+const registeredProvider: {
+  enumNameCompletionItem: vscode.Disposable | undefined;
+  enumMemberCompletionItem: vscode.Disposable | undefined;
+  enumHover: vscode.Disposable | undefined;
+  stringTableNameCompletionItem: vscode.Disposable | undefined;
+  stringTableMemberCompletionItem: vscode.Disposable | undefined;
+  stringTableHover: vscode.Disposable | undefined;
+} = {
+  enumNameCompletionItem: undefined,
+  enumMemberCompletionItem: undefined,
+  enumHover: undefined,
+  stringTableNameCompletionItem: undefined,
+  stringTableMemberCompletionItem: undefined,
+  stringTableHover: undefined,
+}
+
 export const activate = (context: vscode.ExtensionContext) => {
   const register = vscode.commands.registerCommand("extension.showConstants", async () => {
     const folderUri = await readScriptFolder()
@@ -31,38 +47,61 @@ export const activate = (context: vscode.ExtensionContext) => {
       const stringTableMemberCompletionItemProvider = new StringTableMemberCompletionItemProvider(stringTableMap)
       const stringTableHoverProvider = new StringTableHoverProvider(stringTableMap)
 
-      context.subscriptions.push(
-        vscode.languages.registerCompletionItemProvider(
-          { scheme: "file", language: "javascript" },
-          enumNameCompletionItemProvider,
-        ),
+      if (!!registeredProvider.enumNameCompletionItem) {
+        registeredProvider.enumNameCompletionItem.dispose()
+      }
+      registeredProvider.enumNameCompletionItem = vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: "javascript" },
+        enumNameCompletionItemProvider,
       )
-      context.subscriptions.push(
-        vscode.languages.registerCompletionItemProvider(
-          { scheme: "file", language: "javascript" },
-          enumMemberCompletionItemProvider,
-          ".",
-        ),
+      context.subscriptions.push(registeredProvider.enumNameCompletionItem)
+
+      if (!!registeredProvider.enumMemberCompletionItem) {
+        registeredProvider.enumMemberCompletionItem.dispose()
+      }
+      registeredProvider.enumMemberCompletionItem = vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: "javascript" },
+        enumMemberCompletionItemProvider,
+        ".",
       )
-      context.subscriptions.push(
-        vscode.languages.registerHoverProvider({ scheme: "file", language: "javascript" }, enumHoverProvider),
+      context.subscriptions.push(registeredProvider.enumMemberCompletionItem)
+
+      if (!!registeredProvider.enumHover) {
+        registeredProvider.enumHover.dispose()
+      }
+      registeredProvider.enumHover = vscode.languages.registerHoverProvider(
+        { scheme: "file", language: "javascript" },
+        enumHoverProvider,
       )
-      context.subscriptions.push(
-        vscode.languages.registerCompletionItemProvider(
-          { scheme: "file", language: "javascript" },
-          stringTableNameCompletionItemProvider,
-        ),
+      context.subscriptions.push(registeredProvider.enumHover)
+
+      if (!!registeredProvider.stringTableNameCompletionItem) {
+        registeredProvider.stringTableNameCompletionItem.dispose()
+      }
+      registeredProvider.stringTableNameCompletionItem = vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: "javascript" },
+        stringTableNameCompletionItemProvider,
       )
-      context.subscriptions.push(
-        vscode.languages.registerCompletionItemProvider(
-          { scheme: "file", language: "javascript" },
-          stringTableMemberCompletionItemProvider,
-          ".",
-        ),
+      context.subscriptions.push(registeredProvider.stringTableNameCompletionItem)
+
+      if (!!registeredProvider.stringTableMemberCompletionItem) {
+        registeredProvider.stringTableMemberCompletionItem.dispose()
+      }
+      registeredProvider.stringTableMemberCompletionItem = vscode.languages.registerCompletionItemProvider(
+        { scheme: "file", language: "javascript" },
+        stringTableMemberCompletionItemProvider,
+        ".",
       )
-      context.subscriptions.push(
-        vscode.languages.registerHoverProvider({ scheme: "file", language: "javascript" }, stringTableHoverProvider),
+      context.subscriptions.push(registeredProvider.stringTableMemberCompletionItem)
+
+      if (!!registeredProvider.stringTableHover) {
+        registeredProvider.stringTableHover.dispose()
+      }
+      registeredProvider.stringTableHover = vscode.languages.registerHoverProvider(
+        { scheme: "file", language: "javascript" },
+        stringTableHoverProvider,
       )
+      context.subscriptions.push(registeredProvider.stringTableHover)
     }
   })
 
